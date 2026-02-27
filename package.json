@@ -1,0 +1,146 @@
+{
+  "name": "taskling",
+  "displayName": "Taskling",
+  "description": "Discover and run all VS Code tasks from a convenient sidebar panel",
+  "version": "0.0.2",
+  "icon": "resources/logo.png",
+  "license": "MIT",
+  "publisher": "ivolnistov",
+  "homepage": "https://github.com/ivolnistov/taskling",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ivolnistov/taskling"
+  },
+  "bugs": {
+    "url": "https://github.com/ivolnistov/taskling/issues"
+  },
+  "engines": {
+    "vscode": "^1.75.0"
+  },
+  "main": "./out/main.js",
+  "scripts": {
+    "vscode:prepublish": "yarn run compile",
+    "esbuild-base": "rimraf out && esbuild ./src/extension.ts --bundle --outfile=out/main.js --external:vscode --format=cjs --platform=node --target=es6",
+    "esbuild": "npm run -S esbuild-base -- --sourcemap",
+    "package": "vsce package",
+    "install:local": "code --install-extension taskling-0.0.1.vsix",
+    "compile": "npm run esbuild-base",
+    "publish": "vsce publish",
+    "esbuild-watch": "npm run -S esbuild-base -- --sourcemap --watch",
+    "test-compile": "rimraf out && tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "pretest": "yarn run compile && yarn run lint",
+    "lint": "eslint .",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^22.15.0",
+    "@types/vscode": "1.75.1",
+    "esbuild": "^0.27.3",
+    "eslint": "^10.0.2",
+    "eslint-plugin-import": "^2.32.0",
+    "globals": "^17.3.0",
+    "prettier": "^3.8.1",
+    "rimraf": "^6.1.3",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.56.1"
+  },
+  "categories": [
+    "Other"
+  ],
+  "contributes": {
+    "viewsContainers": {
+      "activitybar": [
+        {
+          "id": "taskling",
+          "title": "Taskling",
+          "icon": "resources/taskling.svg"
+        }
+      ]
+    },
+    "views": {
+      "taskling": [
+        {
+          "id": "taskling",
+          "name": "Taskling",
+          "icon": "$(play)"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "taskling.runTask",
+        "title": "Run task",
+        "icon": "$(play)"
+      },
+      {
+        "command": "taskling.refresh",
+        "title": "Refresh list of tasks",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "taskling.viewAsGroups",
+        "title": "Show grouped",
+        "icon": "$(list-tree)"
+      },
+      {
+        "command": "taskling.viewAsList",
+        "title": "Show as list",
+        "icon": "$(list-flat)"
+      }
+    ],
+    "menus": {
+      "view/title": [
+        {
+          "command": "taskling.viewAsGroups",
+          "when": "view == taskling && !isGrouped",
+          "group": "navigation@1"
+        },
+        {
+          "command": "taskling.viewAsList",
+          "when": "view == taskling && isGrouped",
+          "group": "navigation@2"
+        },
+        {
+          "command": "taskling.refresh",
+          "when": "view == taskling",
+          "group": "navigation@3"
+        }
+      ]
+    },
+    "configuration": [
+      {
+        "title": "Taskling",
+        "properties": {
+          "taskling.defaultGrouped": {
+            "type": "boolean",
+            "default": false,
+            "description": "Taskling: initially shows all results grouped (otherwise as list)",
+            "scope": "resource"
+          },
+          "taskling.excludeSources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Hide tasks from specific sources (e.g. [\"npm\", \"gulp\"])",
+            "scope": "resource"
+          },
+          "taskling.includeSources": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "default": [],
+            "description": "Only show tasks from these sources. When set, all other sources are hidden. Takes priority over excludeSources.",
+            "scope": "resource"
+          }
+        }
+      }
+    ]
+  }
+}
